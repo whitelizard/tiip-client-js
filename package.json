@@ -1,0 +1,60 @@
+{
+  "name": "tiip-client-js",
+  "version": "0.5.15",
+  "description": "Websocket based JS client using protocol tiip",
+  "main": "lib/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "clean": "rimraf ./lib/*",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "babel-node": "babel-node",
+    "build": "npm run clean&&babel src -d lib",
+    "lint": "eslint src --ext js --ext jsx",
+    "prepublish": "npm run build",
+    "docgen": "jsdox lib -o docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whitelizard/tiip-client-js.git"
+  },
+  "keywords": [
+    "iot",
+    "tiip",
+    "client",
+    "socket",
+    "websocket"
+  ],
+  "author": "Esbjörn Blomquist",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whitelizard/tiip-client-js/issues"
+  },
+  "homepage": "https://github.com/whitelizard/tiip-client-js#readme",
+  "dependencies": {
+    "babel-polyfill": "^6.9.1",
+    "bluebird": "^3.4.0",
+    "crypto": "0.0.3",
+    "immutable": "^3.8.1",
+    "jstiip": "^1.0.6"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-core": "^6.9.1",
+    "babel-eslint": "^6.0.4",
+    "babel-loader": "^6.2.4",
+    "babel-plugin-transform-class-properties": "^6.9.1",
+    "babel-plugin-transform-object-rest-spread": "^6.8.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "chai": "^3.5.0",
+    "eslint": "^2.12.0",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.8.1",
+    "eslint-plugin-jsx-a11y": "^1.4.2",
+    "eslint-plugin-react": "^5.1.1",
+    "rimraf": "^2.5.2",
+    "websocket": "^1.0.23"
+  }
+}
