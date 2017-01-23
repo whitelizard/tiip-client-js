@@ -12,7 +12,7 @@ export const readyStates = {
   RECONNECT_ABORTED: 4,
 };
 
-const globalVar = typeof global !== 'undefined'
+const globalVar = typeof global !== 'undefined' // eslint-disable-line
   ? global
   : (typeof window !== 'undefined' ? window : {});
 
@@ -65,16 +65,17 @@ export default class WsClient {
     }
     if (protocols) this.protocols = protocols;
 
-    if (options.timeoutStart) this.timeoutStart = options.timeoutStart
+    if (options.timeoutStart) this.timeoutStart = options.timeoutStart;
     else if (!this.timeoutStart) this.timeoutStart = timeoutStart;
 
-    if (options.timeoutMax) this.timeoutMax = options.timeoutMax
+    if (options.timeoutMax) this.timeoutMax = options.timeoutMax;
     else if (!this.timeoutMax) this.timeoutMax = timeoutMax;
 
-    if (options.reconnectIfNotNormalClose)
+    if (options.reconnectIfNotNormalClose) {
       this.reconnectIfNotNormalClose = options.reconnectIfNotNormalClose;
+    }
 
-    if (customWsClient) this.customWsClient = customWsClient;
+    if (options.customWsClient) this.customWsClient = options.customWsClient;
     return this;
   }
 
