@@ -35,6 +35,7 @@ export default class TiipSession {
   connect(url, protocols, options = {}) {
     this.setOptions(options);
     this.socket.connect(url, protocols, options);
+    return this;
   }
 
   setOptions(options) {
@@ -97,12 +98,12 @@ export default class TiipSession {
 
   cachedInit(authObj) {
     return this.socket.init(
-      authObj.userId),
-      authObj.passwordHash),
-      authObj.tenant),
-      authObj.target),
-      authObj.signal),
-      authObj.args),
+      authObj.userId,
+      authObj.passwordHash,
+      authObj.tenant,
+      authObj.target,
+      authObj.signal,
+      authObj.args,
     )
       .then(msgObj => {
         this.authenticated = true;
