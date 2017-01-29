@@ -69,7 +69,7 @@ export default class TiipSession {
     const reqInitObj = { userId, passwordHash, tenant, target, signal, args };
     return this.socket.init(userId, passwordHash, tenant, target, signal, args)
       .then(msgObj => {
-        // console.log('Login reply: ', msgObj.toJS());
+        console.log('Login reply: ', msgObj.toJS());
         this.handleInitReply(msgObj, reqInitObj);
         return msgObj;
       });
