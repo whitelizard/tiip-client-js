@@ -25,6 +25,7 @@ export class TiipSocket {
     this.reqCallbacks = Map();
     this.subCallbacks = Map();
     this.setOptions(options);
+    // this.connectionDelayTimer;
 
     this.ws = new WsClient(url, protocols, options);
     this.ws.onMessage(this.onMessage);
@@ -40,8 +41,7 @@ export class TiipSocket {
    */
   connect(url, protocols, options = {}) {
     this.setOptions(options);
-    this.ws.connect(url, protocols, options);
-    return this;
+    return this.ws.connect(url, protocols, options);
   }
 
   setOptions(options) {
@@ -64,6 +64,7 @@ export class TiipSocket {
 
   clearCallbacks = () => {
     console.log('TiipSocket:clearCallbacks');
+    // clearTimeout(this.connectionDelayTimer);
     this.reqCallbacks.forEach(reqObj => {
       clearTimeout(reqObj.get('timeoutPromise'));
       reqObj.get('reject')(new Error('Clearing all requests'));
@@ -197,7 +198,7 @@ export class TiipSocket {
       })
       .catch((reason) => {
         if (this.sendFailCallback) this.sendFailCallback(reason);
-        return reason;
+        throw new Error(reason);
       });
   }
 
@@ -214,6 +215,9 @@ export class TiipSocket {
   }
 
   requestObj(msgObj) {
+    // if (!this.socket.isOpen()) {
+    //   this.connectionDelayTimer = setTimeout(this.requestObj.bind(msgObj), 100);
+    // }
     const callbackId = this.newCallbackId();
     const msgObjToSend = msgObj;
     msgObjToSend.mid = callbackId;

@@ -22,20 +22,19 @@ export default class TiipSession {
     this.user = undefined;
 
     this.socket = new TiipSocket(url, protocols, options);
-    this.socket.ws.onOpen(this.onOpen);
     this.socket.ws.onClose(this.onClose);
+    // this.socket.ws.onOpen(this.onOpen);
 
-    if (url) {
-      this.connect(url, protocols, options);
-    } else {
-      this.setOptions(options);
-    }
+    // if (url) {
+    //   this.connect(url, protocols, options);
+    // } else {
+    this.setOptions(options);
+    // }
   }
 
   connect(url, protocols, options = {}) {
     this.setOptions(options);
-    this.socket.connect(url, protocols, options);
-    return this;
+    return this.socket.connect(url, protocols, options);
   }
 
   setOptions(options) {
@@ -50,8 +49,8 @@ export default class TiipSession {
     return this.socket.isOpen() && this.authenticated;
   }
 
-  init() {
-    if (this.authenticated) return Promise.resolve(true);
+  init = () => {
+    if (this.authenticated) return Promise.resolve();
     if (globalVar.localStorage) {
       const authObj = JSON.parse(globalVar.localStorage.getItem('authObj'));
       console.log('Cached credentials: ', authObj);
@@ -63,6 +62,7 @@ export default class TiipSession {
   }
 
   auth(userId, password, tenant, target, signal, args) {
+    if (this.authenticated) return Promise.resolve();
     const passwordHash = hashify(password);
     const reqInitObj = { userId, passwordHash, tenant, target, signal, args };
     return this.socket.init(userId, passwordHash, tenant, target, signal, args)
@@ -93,7 +93,7 @@ export default class TiipSession {
     if (globalVar.localStorage) {
       globalVar.localStorage.setItem('authObj', JSON.stringify(this.authObj));
     }
-    this.socket.ws.reconnectIfNotNormalClose = true;
+    // this.socket.ws.reconnectIfNotNormalClose = true;
   }
 
   cachedInit(authObj) {
@@ -109,7 +109,7 @@ export default class TiipSession {
         this.authenticated = true;
         // console.log('Re-login attempt was successful');
         if (this.reloginCallback) this.reloginCallback(msgObj);
-        this.socket.ws.reconnectIfNotNormalClose = true;
+        // this.socket.ws.reconnectIfNotNormalClose = true;
         return msgObj;
       })
       .catch(reason => {
@@ -119,14 +119,17 @@ export default class TiipSession {
       });
   }
 
-  onOpen = () => {
-    if (this.hasBeenConnected && this.authObj) { // Need to relogin?
-      this.cachedInit(this.authObj);
-    }
-  }
+  // onOpen = () => {
+  //   if (this.hasBeenConnected && this.authObj) { // Need to relogin?
+  //     this.cachedInit(this.authObj);
+  //   }
+  // }
 
   onClose = () => {
     this.hasBeenConnected = true;
     this.authenticated = false;
+    if (!this.socket.ws.manualClose) {
+      this.socket.connect().then(this.init);
+    }
   }
 }
