@@ -35,7 +35,7 @@ export default class WsClient {
     this.resolveConnecting = List();
     this.rejectConnecting = List();
     this.sendQueue = List();
-    this.onOpenCallbacks = List();
+    // this.onOpenCallbacks = List();
     this.onCloseCallbacks = List();
     this.onErrorCallbacks = List();
     this.onMessageCallbacks = List();
@@ -52,6 +52,7 @@ export default class WsClient {
   // }
 
   connect = (url, protocols, options = {}) => {
+    console.log('WsClient:connect');
     this.init(url, protocols, options);
     const connectingState = this.socket && (this.socket.readyState === readyStates.CONNECTING);
     return new Promise((resolve, reject) => {
@@ -59,6 +60,7 @@ export default class WsClient {
         resolve();
       } else {
         if (!connectingState && !this.connecting) {
+          console.log('Will createWebSocket...');
           this.connecting = true;
           this.socket = createWebSocket(this.url, this.protocols, this.customWsClient);
           this.socket.onmessage = this.onMessageHandler;
@@ -136,7 +138,7 @@ export default class WsClient {
   }
 
   clearCallbacks() {
-    this.onOpenCallbacks = this.onOpenCallbacks.clear();
+    // this.onOpenCallbacks = this.onOpenCallbacks.clear();
     this.onCloseCallbacks = this.onCloseCallbacks.clear();
     this.onErrorCallbacks = this.onErrorCallbacks.clear();
     this.onMessageCallbacks = this.onMessageCallbacks.clear();
@@ -144,13 +146,13 @@ export default class WsClient {
   }
 
   send(message) {
-    const self = this;
+    const connectingState = this.socket && (this.socket.readyState === readyStates.CONNECTING);
     return new Promise((resolve, reject) => {
-      if (self.socket.readyState === readyStates.RECONNECT_ABORTED) {
-        reject(new Error('Could not send: Socket closed'));
+      if (this.isOpen() || connectingState || this.connecting) {
+        this.sendQueue = this.sendQueue.push({ message, resolve });
+        this.fireQueue();
       } else {
-        self.sendQueue = self.sendQueue.push({ message, resolve });
-        self.fireQueue();
+        reject(new Error('Could not send: Socket closed'));
       }
     });
   }
@@ -185,6 +187,7 @@ export default class WsClient {
   //  PRIVATE
 
   onOpenHandler = (event) => {
+    console.log('WsClient:onOpenHandler');
     // this.reconnectAttempts = 0;
     this.manualClose = false;
     this.connecting = false;
@@ -197,6 +200,7 @@ export default class WsClient {
   }
 
   onCloseHandler = (event) => {
+    console.log('WsClient:onCloseHandler:', event);
     this.socket = undefined;
     this.connecting = false;
     if (!this.rejectConnecting.isEmpty()) {
@@ -211,6 +215,7 @@ export default class WsClient {
   }
 
   onErrorHandler = (event) => {
+    console.log('WsClient:onErrorHandler');
     this.connecting = false;
     if (!this.rejectConnecting.isEmpty()) {
       this.rejectConnecting.forEach(reject => reject(new Error('Error on socket')));

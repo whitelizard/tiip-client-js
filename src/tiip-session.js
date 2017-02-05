@@ -50,6 +50,7 @@ export default class TiipSession {
   }
 
   init = () => {
+    console.log('TiipSession:init');
     if (this.authenticated) return Promise.resolve();
     if (globalVar.localStorage) {
       const authObj = JSON.parse(globalVar.localStorage.getItem('authObj'));
@@ -62,6 +63,7 @@ export default class TiipSession {
   }
 
   auth(userId, password, tenant, target, signal, args) {
+    console.log('TiipSession:auth');
     if (this.authenticated) return Promise.resolve();
     const passwordHash = hashify(password);
     const reqInitObj = { userId, passwordHash, tenant, target, signal, args };
@@ -87,6 +89,7 @@ export default class TiipSession {
   //  PRIVATE METHODS
 
   handleInitReply = (msgObj, reqInitObj) => {
+    console.log('TiipSession:handleInitReply');
     this.authenticated = true;
     this.authObj = reqInitObj;
     this.authObj.rid = msgObj.getIn(['payload', 0]); // assume record id first in payload
@@ -97,6 +100,7 @@ export default class TiipSession {
   }
 
   cachedInit(authObj) {
+    console.log('TiipSession:cachedInit');
     return this.socket.init(
       authObj.userId,
       authObj.passwordHash,
@@ -126,6 +130,7 @@ export default class TiipSession {
   // }
 
   onClose = () => {
+    console.log('TiipSession:onClose');
     this.hasBeenConnected = true;
     this.authenticated = false;
     if (!this.socket.ws.manualClose) {

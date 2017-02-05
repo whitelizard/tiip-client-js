@@ -53,13 +53,19 @@ export class TiipSocket {
   }
 
   init(userId, passwordHash, tenant, target, signal, args) {
+    console.log('TiipSocket:init');
     let argumentz = { id: userId, password: passwordHash };
     if (args) {
       argumentz = { ...args, ...argumentz };
     }
-    return this.request(
-      'init', target || initTarget, signal, argumentz, undefined, tenant
-    );
+    try {
+      return this.request(
+        'init', target || initTarget, signal, argumentz, undefined, tenant
+      );
+    } catch (err) {
+      console.error(err);
+      return Promise.reject(err);
+    }
   }
 
   clearCallbacks = () => {
@@ -191,10 +197,13 @@ export class TiipSocket {
   }
 
   sendRaw(text) {
+    console.log('TiipSocket:sendRaw:', text);
     // console.log('Sending: ', text);//Commented out: Use callbacks from app to get debug printing
     return this.ws.send(text)
       .then(() => {
+        console.log('TiipSocket:send Succeeded!');
         if (this.sendCallback) this.sendCallback(text);
+        return text;
       })
       .catch((reason) => {
         if (this.sendFailCallback) this.sendFailCallback(reason);
@@ -206,10 +215,10 @@ export class TiipSocket {
     const msg = { type };
     if (target !== undefined) msg.target = target;
     if (signal !== undefined) msg.signal = signal;
-    if (args !== undefined) msg.args = args;
-    if (payload !== undefined) msg.payload = payload;
+    if (args !== undefined) msg.arguments = Iterable.isIterable(args) ? args.toJS() : args;
+    if (payload !== undefined) msg.payload = Iterable.isIterable(payload) ? payload.toJS() : payload;
     if (tenant !== undefined) msg.tenant = tenant;
-    if (source !== undefined) msg.source = source;
+    if (source !== undefined) msg.source = Iterable.isIterable(source) ? source.toJS() : source;
     if (channel !== undefined) msg.channel = channel;
     return this.requestObj(msg);
   }
@@ -223,7 +232,7 @@ export class TiipSocket {
     msgObjToSend.mid = callbackId;
 
     return new Promise((resolve, reject) => {
-      this.sendObj(msgObj)
+      this.sendObj(msgObjToSend)
         .then(() => {
           this.reqCallbacks = this.reqCallbacks.set(callbackId, fromJS({
             time: new Date(),
