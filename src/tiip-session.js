@@ -93,6 +93,7 @@ export default class TiipSession {
     if (globalVar.localStorage) {
       globalVar.localStorage.setItem('authObj', JSON.stringify(this.authObj));
     }
+    this.socket.ws.reconnectIfNotNormalClose = true;
   }
 
   cachedInit(authObj) {
@@ -108,6 +109,7 @@ export default class TiipSession {
         this.authenticated = true;
         // console.log('Re-login attempt was successful');
         if (this.reloginCallback) this.reloginCallback(msgObj);
+        this.socket.ws.reconnectIfNotNormalClose = true;
         return msgObj;
       })
       .catch(reason => {

@@ -26,10 +26,7 @@ export class TiipSocket {
     this.subCallbacks = Map();
     this.setOptions(options);
 
-    this.ws = new WsClient(url, protocols, {
-      reconnectIfNotNormalClose: true,
-      ...options,
-    });
+    this.ws = new WsClient(url, protocols, options);
     this.ws.onMessage(this.onMessage);
     this.ws.onClose(this.clearCallbacks);
   }
@@ -43,10 +40,7 @@ export class TiipSocket {
    */
   connect(url, protocols, options = {}) {
     this.setOptions(options);
-    this.ws.connect(url, protocols, {
-      reconnectIfNotNormalClose: true,
-      ...options,
-    });
+    this.ws.connect(url, protocols, options);
     return this;
   }
 
@@ -54,7 +48,7 @@ export class TiipSocket {
     if (options.onSend) this.sendCallback = options.onSend;
     if (options.onSendFail) this.sendFailCallback = options.onSendFail;
     if (options.onReceive) this.receiveCallback = options.onReceive;
-    if (options.timeoutOnRequests) this.timeoutOnRequests = options.timeoutOnRequests
+    if (options.timeoutOnRequests) this.timeoutOnRequests = options.timeoutOnRequests;
     else if (!this.timeoutOnRequests) this.timeoutOnRequests = timeoutOnRequests;
   }
 
@@ -64,7 +58,7 @@ export class TiipSocket {
       argumentz = { ...args, ...argumentz };
     }
     return this.request(
-      'init', target || defaults.initTarget, signal, argumentz, undefined, tenant
+      'init', target || initTarget, signal, argumentz, undefined, tenant
     );
   }
 
@@ -208,7 +202,7 @@ export class TiipSocket {
   }
 
   request(type, target, signal, args, payload, tenant, source, channel) {
-    let msg = { type };
+    const msg = { type };
     if (target !== undefined) msg.target = target;
     if (signal !== undefined) msg.signal = signal;
     if (args !== undefined) msg.args = args;
@@ -221,7 +215,8 @@ export class TiipSocket {
 
   requestObj(msgObj) {
     const callbackId = this.newCallbackId();
-    msgObj.mid = callbackId;
+    const msgObjToSend = msgObj;
+    msgObjToSend.mid = callbackId;
 
     return new Promise((resolve, reject) => {
       this.sendObj(msgObj)
@@ -301,7 +296,7 @@ export class TiipSocket {
           // First, try exact matching:
           let done = this.subCallbacks.forEach((value, key) => {
             if (key === channel) {
-              callSubCallback(key, msgObj);
+              this.callSubCallback(key, msgObj);
               return false; // done
             }
             return true;
@@ -310,7 +305,7 @@ export class TiipSocket {
           if (!done) {
             done = this.subCallbacks.forEach((value, key) => {
               if (key === channel.substring(0, key.length)) {
-                callSubCallback(key, msgObj);
+                this.callSubCallback(key, msgObj);
                 return false; // done
               }
               return true;

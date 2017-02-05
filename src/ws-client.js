@@ -167,7 +167,7 @@ export default class WsClient {
   onCloseHandler = (event) => {
     this.onCloseCallbacks.forEach(cb => cb(event));
     const notNormalReconnect = this.reconnectIfNotNormalClose && !this.manualClose;
-    if (notNormalReconnect || event.code === reconnectableStatus) {
+    if (notNormalReconnect && event.code === reconnectableStatus) {
       this.reconnect();
     }
   }
