@@ -69,6 +69,7 @@ export class TiipSocket {
   }
 
   clearCallbacks = () => {
+    console.log('TiipSocket:clearCallbacks');
     this.reqCallbacks.forEach(reqObj => {
       clearTimeout(reqObj.get('timeoutPromise'));
       reqObj.get('reject')(new Error('Clearing all requests'));
@@ -237,7 +238,7 @@ export class TiipSocket {
             }, this.timeoutOnRequests),
           }));
         })
-        .catch(reason => reject(reason)); // reject the outer promise
+        .catch(reason => reject(new Error(reason))); // reject the outer promise
     });
   }
 

@@ -1,9 +1,8 @@
 import { TiipSocket } from './tiip-socket';
-import { fromJS } from 'immutable';
 import crypto from 'crypto';
 import Promise from 'bluebird';
 
-const globalVar = typeof global !== 'undefined'
+const globalVar = typeof global !== 'undefined' // eslint-disable-line
   ? global
   : (typeof window !== 'undefined' ? window : {});
 
@@ -13,7 +12,8 @@ function hashify(phrase) {
 
 export default class TiipSession {
 
-  // ------ SETUP ------ //
+  // ==============================================================================================
+  //  SETUP
 
   constructor(url, protocols, options = {}) {
     this.authenticated = false;
@@ -41,19 +41,17 @@ export default class TiipSession {
   setOptions(options) {
     if (options.onRelogin) this.reloginCallback = options.onRelogin;
     if (options.onReloginFail) this.reloginFailCallback = options.onReloginFail;
-    // if (options.userObjUpdateCallback) this.userObjUpdateCallback = options.userObjUpdateCallback;
-    // if (options.confAPIName) this.confAPIName = options.confAPIName;
-    // if (options.readUserSignal) this.readUserSignal = options.readUserSignal;
-    // if (options.confUpdateSignal) this.confUpdateSignal = options.confUpdateSignal;
   }
 
-  // ------ INTERFACE IMPLEMENTATION ------ //
+  // ==============================================================================================
+  //  INTERFACE IMPLEMENTATION
 
   isOpen() {
     return this.socket.isOpen() && this.authenticated;
   }
 
   init() {
+    if (this.authenticated) return Promise.resolve(true);
     if (globalVar.localStorage) {
       const authObj = JSON.parse(globalVar.localStorage.getItem('authObj'));
       console.log('Cached credentials: ', authObj);
@@ -85,7 +83,8 @@ export default class TiipSession {
     return this.socket.kill(true);
   }
 
-  // ------ PRIVATE METHODS ------ //
+  // ==============================================================================================
+  //  PRIVATE METHODS
 
   handleInitReply = (msgObj, reqInitObj) => {
     this.authenticated = true;
@@ -114,12 +113,13 @@ export default class TiipSession {
       .catch(reason => {
         // console.log('Re-login attempt failed: ', reason);
         if (this.reloginFailCallback) this.reloginFailCallback(reason);
+        throw new Error(reason);
       });
   }
 
   onOpen = () => {
-    if (this.hasBeenConnected && this.authObj) {  // Need to relogin?
-      this.cachedInit();
+    if (this.hasBeenConnected && this.authObj) { // Need to relogin?
+      this.cachedInit(this.authObj);
     }
   }
 
