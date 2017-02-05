@@ -30,6 +30,7 @@ export default class WsClient {
   constructor(url, protocols, options = {}) {
     this.init(url, protocols, options);
     this.reconnectAttempts = 0;
+    // this.connecting = false;
     this.manualClose = false;
     this.sendQueue = List();
     this.onOpenCallbacks = List();
@@ -43,9 +44,12 @@ export default class WsClient {
   //  PUBLIC
 
   connect = (url, protocols, options = {}) => {
+    // if (this.connecting) return this;
     this.init(url, protocols, options);
-    console.log('WsClient:connect readyState:', this.socket.readyState);
-    if (!this.isOpen() && this.socket.readyState !== readyStates.CONNECTING) {
+    console.log('WsClient:connect readyState:', this.socket && this.socket.readyState);
+    const connectingState = this.socket && (this.socket.readyState === readyStates.CONNECTING);
+    if (!this.isOpen() && !connectingState) {
+      // this.connecting = true;
       this.socket = createWebSocket(this.url, this.protocols, this.customWsClient);
       this.socket.onmessage = this.onMessageHandler;
       this.socket.onopen = this.onOpenHandler;
@@ -132,6 +136,7 @@ export default class WsClient {
       this.reconnectTimer = undefined;
     }
     this.socket.close();
+    this.socket = undefined;
   }
 
   reconnect() {
@@ -161,12 +166,14 @@ export default class WsClient {
   onOpenHandler = (event) => {
     this.reconnectAttempts = 0;
     this.manualClose = false;
+    // this.connecting = false;
     this.onOpenCallbacks.forEach(cb => cb(event));
     this.fireQueue();
   }
 
   onCloseHandler = (event) => {
     this.onCloseCallbacks.forEach(cb => cb(event));
+    // this.connecting = false;
     const notNormalReconnect = this.reconnectIfNotNormalClose && !this.manualClose;
     if (notNormalReconnect && event.code === reconnectableStatus) {
       this.reconnect();
