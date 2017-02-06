@@ -1,9 +1,6 @@
-/** @module archmage-socket
- * @description High level Socket class agains an ARCHMAGE server.
- */
-import WsClient from './ws-client';
+import observableSocket from 'observable-socket';
+import ws from 'ws';
 import * as tiip from 'jstiip';
-import Promise from 'bluebird';
 import { Map, List, Set, fromJS, Iterable, OrderedSet } from 'immutable';
 
 const initTarget = 'TiipController';
@@ -14,42 +11,40 @@ const nonMetaFields = Set.of('timestamp', 'source', 'signal', 'payload', 'client
 
 export class TiipSocket {
 
-  /**
-   * TiipSocket constructor. Does not connect.
-   * @param  {object} url Websocket URL
-   * @param  {string} protocols Protocols object for the browser WebSocket API
-   * @param  {string} options Options object {onSend, onSendFail, onReceive, timeoutOnRequests}
-   */
-  constructor(url, protocols, options = {}) {
+  constructor(url, options = {}) {
     this.currentCallbackId = 0;
     this.reqCallbacks = Map();
     this.subCallbacks = Map();
-    this.setOptions(options);
-    // this.connectionDelayTimer;
-
-    this.ws = new WsClient(url, protocols, options);
-    this.ws.onMessage(this.onMessage);
-    this.ws.onClose(this.clearCallbacks);
+    this.setOptions(url, options);
   }
 
-  /**
-   * Connect the socket. Will handle same arguments as the constructor.
-   * @param  {object} url Websocket URL
-   * @param  {string} protocols Protocols object for the browser WebSocket API
-   * @param  {string} options Options object {onSend, onSendFail, onReceive, timeoutOnRequests}
-   * @return {object}  The whole Socket (this)
-   */
-  connect(url, protocols, options = {}) {
-    this.setOptions(options);
-    return this.ws.connect(url, protocols, options);
+  connect(url, options = {}) {
+    this.setOptions(url, options);
+    this.oSocket = observableSocket(ws(this.url));
+    this.oSocket.down.subscribe(
+      this.onMessage,
+      this.onError,
+      (ev) => {
+        this.clearCallbacks();
+        window.requestIdleCallback(() => {
+          this.oSocket = undefined;
+          this.onClose(ev);
+        });
+      },
+    );
+    return this;
   }
 
-  setOptions(options) {
+  setOptions(url, options) {
+    if (url) {
+      this.url = url;
+      this.isEncrypted = /^(wss:)/i.test(this.url);
+    }
     if (options.onSend) this.sendCallback = options.onSend;
-    if (options.onSendFail) this.sendFailCallback = options.onSendFail;
     if (options.onReceive) this.receiveCallback = options.onReceive;
-    if (options.timeoutOnRequests) this.timeoutOnRequests = options.timeoutOnRequests;
-    else if (!this.timeoutOnRequests) this.timeoutOnRequests = timeoutOnRequests;
+    this.onError = options.onError || (err => console.error('Socket error:', err));
+    this.onClose = options.onClose || (ev => console.warn('Socket closed:', ev.code, ev.reason));
+    this.timeoutOnRequests = options.timeoutOnRequests || timeoutOnRequests;
   }
 
   init(userId, passwordHash, tenant, target, signal, args) {
@@ -58,19 +53,13 @@ export class TiipSocket {
     if (args) {
       argumentz = { ...args, ...argumentz };
     }
-    try {
-      return this.request(
-        'init', target || initTarget, signal, argumentz, undefined, tenant
-      );
-    } catch (err) {
-      console.error(err);
-      return Promise.reject(err);
-    }
+    return this.request(
+      'init', target || initTarget, signal, argumentz, undefined, tenant
+    );
   }
 
   clearCallbacks = () => {
     console.log('TiipSocket:clearCallbacks');
-    // clearTimeout(this.connectionDelayTimer);
     this.reqCallbacks.forEach(reqObj => {
       clearTimeout(reqObj.get('timeoutPromise'));
       reqObj.get('reject')(new Error('Clearing all requests'));
@@ -79,9 +68,16 @@ export class TiipSocket {
     this.subCallbacks = this.subCallbacks.clear();
   }
 
+  isOpen() {
+    return this.oSocket.ws.readyState === 1;
+  }
+
+  bufferedAmount() {
+    return this.oSocket.ws.socket.bufferedAmount;
+  }
+
   kill(force) {
-    // this.clearCallbacks();
-    return this.ws.close(force);
+    return this.oSocket.ws.close(force);
   }
 
   req(target, signal, args, tenant) {
@@ -172,14 +168,6 @@ export class TiipSocket {
     );
   }
 
-  isOpen() {
-    return this.ws.isOpen();
-  }
-
-  bufferedAmount() {
-    return this.ws.socket.bufferedAmount;
-  }
-
   send(type, target, signal, args, payload, tenant, source, channel) {
     const tiipMsg = tiip.pack(
       type, target, signal,
@@ -199,7 +187,7 @@ export class TiipSocket {
   sendRaw(text) {
     console.log('TiipSocket:sendRaw:', text);
     // console.log('Sending: ', text);//Commented out: Use callbacks from app to get debug printing
-    return this.ws.send(text)
+    return this.oSocket.up(text)
       .then(() => {
         console.log('TiipSocket:send Succeeded!');
         if (this.sendCallback) this.sendCallback(text);
@@ -216,7 +204,9 @@ export class TiipSocket {
     if (target !== undefined) msg.target = target;
     if (signal !== undefined) msg.signal = signal;
     if (args !== undefined) msg.arguments = Iterable.isIterable(args) ? args.toJS() : args;
-    if (payload !== undefined) msg.payload = Iterable.isIterable(payload) ? payload.toJS() : payload;
+    if (payload !== undefined) {
+      msg.payload = Iterable.isIterable(payload) ? payload.toJS() : payload;
+    }
     if (tenant !== undefined) msg.tenant = tenant;
     if (source !== undefined) msg.source = Iterable.isIterable(source) ? source.toJS() : source;
     if (channel !== undefined) msg.channel = channel;
@@ -224,9 +214,6 @@ export class TiipSocket {
   }
 
   requestObj(msgObj) {
-    // if (!this.socket.isOpen()) {
-    //   this.connectionDelayTimer = setTimeout(this.requestObj.bind(msgObj), 100);
-    // }
     const callbackId = this.newCallbackId();
     const msgObjToSend = msgObj;
     msgObjToSend.mid = callbackId;
@@ -268,6 +255,7 @@ export class TiipSocket {
   }
 
   onMessage = (msg) => {
+    console.log('TiipSocket:onMessage:', msg);
     let msgObj;
     let isTiip = true;
     let errorReason = undefined;

@@ -15,29 +15,22 @@ export default class TiipSession {
   // ==============================================================================================
   //  SETUP
 
-  constructor(url, protocols, options = {}) {
+  constructor(url, options = {}) {
     this.authenticated = false;
-    this.hasBeenConnected = false;
+    // this.hasBeenConnected = false;
     this.authObj = undefined;
-    this.user = undefined;
-
-    this.socket = new TiipSocket(url, protocols, options);
-    this.socket.ws.onClose(this.onClose);
-    // this.socket.ws.onOpen(this.onOpen);
-
-    // if (url) {
-    //   this.connect(url, protocols, options);
-    // } else {
     this.setOptions(options);
-    // }
+
+    this.socket = new TiipSocket(url, { ...options, onClose: this.onClose });
   }
 
-  connect(url, protocols, options = {}) {
+  connect(url, options = {}) {
     this.setOptions(options);
-    return this.socket.connect(url, protocols, options);
+    return this.socket.connect(url, options);
   }
 
   setOptions(options) {
+    this.manualClose = false;
     if (options.onRelogin) this.reloginCallback = options.onRelogin;
     if (options.onReloginFail) this.reloginFailCallback = options.onReloginFail;
   }
@@ -76,7 +69,7 @@ export default class TiipSession {
   }
 
   logout() {
-    this.user = undefined;
+    this.manualClose = true;
     this.authenticated = false;
     this.authObj = undefined;
     if (globalVar.localStorage) {
@@ -131,10 +124,11 @@ export default class TiipSession {
 
   onClose = () => {
     console.log('TiipSession:onClose');
-    this.hasBeenConnected = true;
+    // this.hasBeenConnected = true;
     this.authenticated = false;
-    if (!this.socket.ws.manualClose) {
-      this.socket.connect().then(this.init);
+    if (!this.manualClose) {
+      this.socket.connect();
+      this.init();
     }
   }
 }

@@ -34,10 +34,11 @@
   "homepage": "https://github.com/whitelizard/tiip-client-js#readme",
   "dependencies": {
     "babel-polyfill": "^6.9.1",
-    "bluebird": "^3.4.0",
     "crypto": "0.0.3",
     "immutable": "^3.8.1",
-    "jstiip": "^1.0.6"
+    "jstiip": "^1.0.6",
+    "observable-socket": "^5.0.0-beta3",
+    "ws": "^2.0.2"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
