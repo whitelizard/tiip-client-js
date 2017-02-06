@@ -1,6 +1,7 @@
+import 'babel-polyfill';
 import { TiipSocket } from './tiip-socket';
 import crypto from 'crypto';
-import Promise from 'bluebird';
+// import Promise from 'bluebird';
 
 const globalVar = typeof global !== 'undefined' // eslint-disable-line
   ? global

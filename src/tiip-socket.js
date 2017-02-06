@@ -1,5 +1,4 @@
 import observableSocket from 'observable-socket';
-import ws from 'ws';
 import * as tiip from 'jstiip';
 import { Map, List, Set, fromJS, Iterable, OrderedSet } from 'immutable';
 
@@ -8,6 +7,10 @@ const timeoutOnRequests = 30 * 1000;
 const midMax = 10000;
 const timeoutErrorMessage = 'Timeout';
 const nonMetaFields = Set.of('timestamp', 'source', 'signal', 'payload', 'clientTime');
+
+const globalVar = typeof global !== 'undefined' // eslint-disable-line
+  ? global
+  : (typeof window !== 'undefined' ? window : {});
 
 export class TiipSocket {
 
@@ -18,9 +21,18 @@ export class TiipSocket {
     this.setOptions(url, options);
   }
 
+  getSocketConstructor() {
+    return this.customWsClient || globalVar.WebSocket || globalVar.MozWebSocket;
+  }
+
   connect(url, options = {}) {
     this.setOptions(url, options);
-    this.oSocket = observableSocket(ws(this.url));
+    const urlOk = /wss?:\/\//.exec(url);
+    if (!urlOk) {
+      throw new Error('Invalid url provided');
+    }
+    const wsConstr = this.customWsClient || globalVar.WebSocket || globalVar.MozWebSocket;
+    this.oSocket = observableSocket(wsConstr(this.url));
     this.oSocket.down.subscribe(
       this.onMessage,
       this.onError,
@@ -40,11 +52,20 @@ export class TiipSocket {
       this.url = url;
       this.isEncrypted = /^(wss:)/i.test(this.url);
     }
+    if (options.customWsClient) {
+      this.customWsClient = options.customWsClient;
+    }
     if (options.onSend) this.sendCallback = options.onSend;
     if (options.onReceive) this.receiveCallback = options.onReceive;
-    this.onError = options.onError || (err => console.error('Socket error:', err));
-    this.onClose = options.onClose || (ev => console.warn('Socket closed:', ev.code, ev.reason));
-    this.timeoutOnRequests = options.timeoutOnRequests || timeoutOnRequests;
+    if (options.onError) {
+      this.onError = options.onError || (err => console.error('Socket error:', err));
+    }
+    if (options.onClose) {
+      this.onClose = options.onClose || (ev => console.warn('Socket closed:', ev.code, ev.reason));
+    }
+    if (options.timeoutOnRequests) {
+      this.timeoutOnRequests = options.timeoutOnRequests || timeoutOnRequests;
+    }
   }
 
   init(userId, passwordHash, tenant, target, signal, args) {

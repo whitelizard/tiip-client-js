@@ -7,11 +7,12 @@
     "doc": "docs"
   },
   "scripts": {
-    "clean": "rimraf ./lib/*",
+    "clean": "rimraf ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "babel-node": "babel-node",
-    "build": "npm run clean&&babel src -d lib",
+    "compile": "babel src/tiip-socket.js src/tiip-session.js -o index.js",
     "lint": "eslint src --ext js --ext jsx",
+    "build": "npm run clean && npm run lint && npm run compile",
     "prepublish": "npm run build",
     "docgen": "jsdox lib -o docs"
   },
@@ -37,10 +38,11 @@
     "crypto": "0.0.3",
     "immutable": "^3.8.1",
     "jstiip": "^1.0.6",
-    "observable-socket": "^5.0.0-beta3",
-    "ws": "^2.0.2"
+    "observable-socket": "^5.0.0-beta3"
   },
   "devDependencies": {
+    "browserify": "^14.0.0",
+    "webpack": "^2.2.1",
     "babel-cli": "^6.10.1",
     "babel-core": "^6.9.1",
     "babel-eslint": "^6.0.4",
