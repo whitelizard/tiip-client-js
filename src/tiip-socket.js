@@ -32,7 +32,7 @@ export class TiipSocket {
     this.setOptions(url, options);
     const urlOk = /wss?:\/\//.exec(url);
     if (!urlOk) {
-      throw new Error('Invalid url provided');
+      throw new Error(`Invalid url provided: ${url}`);
     }
     const Socket = this.customWsClient || globalVar.WebSocket || globalVar.MozWebSocket;
     this.oSocket = observableSocket(new Socket(this.url));
@@ -86,6 +86,10 @@ export class TiipSocket {
 
   isOpen() {
     return this.oSocket && this.oSocket.ws && this.oSocket.ws.readyState === 1;
+  }
+
+  isClosed() {
+    return !this.oSocket || !this.oSocket.ws || this.oSocket.ws.readyState === 3;
   }
 
   bufferedAmount() {

@@ -26,6 +26,7 @@ export default class TiipSession {
   }
 
   connect(url, options = {}) {
+    if (!this.isClosed()) return undefined;
     this.setOptions(options);
     return this.socket.connect(url, options);
   }
@@ -41,6 +42,10 @@ export default class TiipSession {
 
   isOpen() {
     return this.socket.isOpen() && this.authenticated;
+  }
+
+  isClosed() {
+    return this.socket.isClosed();
   }
 
   init = () => {
