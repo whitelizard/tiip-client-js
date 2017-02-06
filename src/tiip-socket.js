@@ -18,6 +18,9 @@ export class TiipSocket {
     this.currentCallbackId = 0;
     this.reqCallbacks = Map();
     this.subCallbacks = Map();
+    this.timeoutOnRequests = timeoutOnRequests;
+    this.onClose = ev => console.warn('Socket closed:', ev.code, ev.reason;
+    this.onError = err => console.error('Socket error:', err);
     this.setOptions(url, options);
   }
 
@@ -52,20 +55,12 @@ export class TiipSocket {
       this.url = url;
       this.isEncrypted = /^(wss:)/i.test(this.url);
     }
-    if (options.customWsClient) {
-      this.customWsClient = options.customWsClient;
-    }
+    if (options.customWsClient) this.customWsClient = options.customWsClient;
     if (options.onSend) this.sendCallback = options.onSend;
     if (options.onReceive) this.receiveCallback = options.onReceive;
-    if (options.onError) {
-      this.onError = options.onError || (err => console.error('Socket error:', err));
-    }
-    if (options.onClose) {
-      this.onClose = options.onClose || (ev => console.warn('Socket closed:', ev.code, ev.reason));
-    }
-    if (options.timeoutOnRequests) {
-      this.timeoutOnRequests = options.timeoutOnRequests || timeoutOnRequests;
-    }
+    if (options.onError) this.onError = options.onError;
+    if (options.onClose) this.onClose = options.onClose);
+    if (options.timeoutOnRequests) this.timeoutOnRequests = options.timeoutOnRequests;
   }
 
   init(userId, passwordHash, tenant, target, signal, args) {
@@ -276,7 +271,7 @@ export class TiipSocket {
   }
 
   onMessage = (msg) => {
-    console.log('TiipSocket:onMessage:', msg);
+    console.log('TiipSocket:onMessage:', msg.data);
     let msgObj;
     let isTiip = true;
     let errorReason = undefined;
