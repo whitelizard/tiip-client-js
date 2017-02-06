@@ -1,6 +1,6 @@
 {
   "name": "tiip-client-js",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Websocket based JS client using protocol tiip",
   "main": "lib/index.js",
   "directories": {
