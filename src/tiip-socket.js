@@ -19,7 +19,7 @@ export class TiipSocket {
     this.reqCallbacks = Map();
     this.subCallbacks = Map();
     this.timeoutOnRequests = timeoutOnRequests;
-    this.onClose = ev => console.warn('Socket closed:', ev.code, ev.reason;
+    this.onClose = ev => console.warn('Socket closed:', ev.code, ev.reason);
     this.onError = err => console.error('Socket error:', err);
     this.setOptions(url, options);
   }
