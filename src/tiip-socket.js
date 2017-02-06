@@ -31,8 +31,8 @@ export class TiipSocket {
     if (!urlOk) {
       throw new Error('Invalid url provided');
     }
-    const wsConstr = this.customWsClient || globalVar.WebSocket || globalVar.MozWebSocket;
-    this.oSocket = observableSocket(wsConstr(this.url));
+    const Socket = this.customWsClient || globalVar.WebSocket || globalVar.MozWebSocket;
+    this.oSocket = observableSocket(new Socket(this.url));
     this.oSocket.down.subscribe(
       this.onMessage,
       this.onError,
