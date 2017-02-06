@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import { List } from 'immutable';
 
-const reconnectableStatus = 4000;
+// const reconnectableStatus = 4000;
 const timeoutStart = 300;
 const timeoutMax = 2 * 60 * 1000;
 export const readyStates = {
@@ -48,7 +48,7 @@ export default class WsClient {
   // connectedCheck(resolve, reject, count) {
   //   if (this.isOpen()) return resolve();
   //   if (count > 20 * 30) return reject(new Error('Could not connect socket'));
-  //   return setTimeout(this.connectedCheck.bind(resolve, reject, ++count), 50); // eslint-disable-line
+  //   return setTimeout(this.connectedCheck.bind(resolve, reject, ++count), 50);
   // }
 
   connect = (url, protocols, options = {}) => {
