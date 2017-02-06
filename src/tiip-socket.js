@@ -59,7 +59,7 @@ export class TiipSocket {
     if (options.onSend) this.sendCallback = options.onSend;
     if (options.onReceive) this.receiveCallback = options.onReceive;
     if (options.onError) this.onError = options.onError;
-    if (options.onClose) this.onClose = options.onClose);
+    if (options.onClose) this.onClose = options.onClose;
     if (options.timeoutOnRequests) this.timeoutOnRequests = options.timeoutOnRequests;
   }
 
