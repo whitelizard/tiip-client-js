@@ -90,15 +90,15 @@ export class TiipSocket {
   }
 
   isOpen() {
-    return this.oSocket.ws.readyState === 1;
+    return this.oSocket && this.oSocket.ws && this.oSocket.ws.readyState === 1;
   }
 
   bufferedAmount() {
-    return this.oSocket.ws.socket.bufferedAmount;
+    return this.oSocket && this.oSocket.ws && this.oSocket.ws.socket.bufferedAmount;
   }
 
   kill(force) {
-    return this.oSocket.ws.close(force);
+    return this.oSocket && this.oSocket.ws && this.oSocket.ws.close(force);
   }
 
   req(target, signal, args, tenant) {
