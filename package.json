@@ -43,8 +43,6 @@
     "observable-socket": "^5.0.0-beta3"
   },
   "devDependencies": {
-    "browserify": "^14.0.0",
-    "webpack": "^2.2.1",
     "babel-cli": "^6.10.1",
     "babel-core": "^6.9.1",
     "babel-eslint": "^6.0.4",
