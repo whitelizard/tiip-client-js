@@ -24,10 +24,6 @@ export class TiipSocket {
     this.setOptions(url, options);
   }
 
-  getSocketConstructor() {
-    return this.customWsClient || globalVar.WebSocket || globalVar.MozWebSocket;
-  }
-
   connect(url, options = {}) {
     this.setOptions(url, options);
     const urlOk = /wss?:\/\//.exec(url);
