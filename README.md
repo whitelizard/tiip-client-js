@@ -9,12 +9,17 @@ The **socket** object contains the patterns/calls. The **session** object is the
 
 ```
 import TiipSession from 'tiip-client-js';
+
 const session = new TiipSession();
+
 session.connect('wss://echo.websocket.org');
+
 // Try to init with cached credentials
 session.init();
+
 // In other case
 session.auth(userId, passphrase, tenant);
+
 // Test if we are connected and authenticated
 if (session.authenticated) ...
 ```
