@@ -22,6 +22,8 @@ session.auth(userId, passphrase);
 
 // Test if we are connected and authenticated
 if (session.authenticated) ...
+
+session.logout()
 ```
 
 ### ```session.init();```
