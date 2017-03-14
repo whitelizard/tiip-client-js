@@ -2,7 +2,7 @@
 Websocket based JS client using protocol tiip. Contains patterns *req/rep* and *pub/sub*.
 
 ```
-npm i -S archmage-client
+npm i -S tiip-client-js
 ```
 
 The **socket** object contains the patterns/calls. The **session** object is the authentication layer on top of the socket. A *session* object always has a *socket* object inside (Note how the different calls look below).
