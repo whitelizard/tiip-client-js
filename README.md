@@ -26,6 +26,24 @@ if (session.authenticated) ...
 session.logout()
 ```
 
+### ```TiipSession([url, options])```
+Constructor of a TiipSession object.
+Returns a TiipSession (with `new`).
+-	**url:** Full address of websocket endpoint.
+- **options:** Option object with the following possible key/values:
+  - onRelogin: Callback function that is called when a re-login happens.
+  - onReloginFail: Callback function called if a re-login fails.
+  - customWsClient: A websocket class to use instead of the built-in.
+  - onSend: Callback function invoked whenever something is sent on the socket.
+  - onReceive: Callback function called when a message is received.
+  - onError: Callback function invoked in case of error on the socket.
+  - onClose: Callback function called when the socket closes.
+  - timeoutOnRequests: Number of milliseconds to use as request timeout (default 30 seconds).
+
+### ```session.connect([url, options]);```
+Connect the socket, using *url* and *options* set via the constructor, or new ones passed here.
+Returns the session object (to enable chaining).
+
 ### ```session.init();```
 Authenticate with possible cached credentials, otherwise rejects.
 Returns a promise that resolves on a successful response from the server.
