@@ -1,5 +1,5 @@
 # tiip-client-js
-Websocket based JS client using protocol tiip. Contains patterns *req/rep* and *pub/sub*.
+Websocket based JS client using protocol [tiip](https://github.com/whitelizard/tiip). Contains patterns *req/rep* and *pub/sub*.
 
 ```
 npm i -S tiip-client-js
