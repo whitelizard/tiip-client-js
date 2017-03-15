@@ -7,7 +7,7 @@ npm i -S tiip-client-js
 
 The **socket** object contains the patterns/calls. The **session** object is the authentication layer on top of the socket. A *session* object always has a *socket* object inside (Note how the different calls look below).
 
-Example of setup and use of the session object:
+Example of setup and use of the `session` object:
 ```
 import TiipSession from 'tiip-client-js';
 
@@ -27,7 +27,7 @@ if (session.authenticated) ...
 session.logout()
 ```
 
-Examples of session.socket calls:
+Examples of `session.socket` calls:
 ```
 // session object setup as above
 
