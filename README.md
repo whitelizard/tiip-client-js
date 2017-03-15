@@ -7,6 +7,7 @@ npm i -S tiip-client-js
 
 The **socket** object contains the patterns/calls. The **session** object is the authentication layer on top of the socket. A *session* object always has a *socket* object inside (Note how the different calls look below).
 
+Example of setup and use of the session object:
 ```
 import TiipSession from 'tiip-client-js';
 
@@ -25,6 +26,18 @@ if (session.authenticated) ...
 
 session.logout()
 ```
+
+Examples of session.socket calls:
+```
+// session object setup as above
+
+// all these calls are of course depending on server API
+session.socket.req('main', 'readProfile');
+session.socket.req('main', 'readUser', {descending: false});
+session.socket.req('weather', 'readWeatherData', {lat: 58.554, lon: 16.713});
+session.socket.sub(msg => console.log(msg.toJS()), '#77:3'); // msg will be delivered as an immutablejs map
+```
+
 
 ### ```TiipSession([url, options])```
 Constructor of a TiipSession object.
@@ -62,14 +75,14 @@ Returns a promise that resolves on a successful response from the server.
 
 ### ```session.socket.req(target, signal, [args, tenant]);```
 Send a request, get a reply (req/rep).
-Returns a promise that resolves on a successful response from the server.
+Returns a promise that resolves on a successful response from the server. The reply will be an immutablejs map.
 -	**target:** The sub system or micro service that should receive the request.
 -	**signal:** The specific API call or "question". Example: ‘readUser’.
 -	**args:** (optional) An object with arguments for that particular API call (signal). Example: {"name": "Tom"}
 -	**tenant:** Possible use of tenant, depends on server API.
 
 ### ```session.socket.sub(callback, channel, [subChannel, tenant, args]);```
-Starts a subscription to a channel (pub/sub).
+Starts a subscription to a channel (pub/sub). The messages delivered to the callback will be of type immutablejs map.
 Returns a promise that resolves on a successful response from the server.
 -	**callback:** The callback function to run when a message arrives on the subscribed channel.
 -	**channel:** The channel to subscribe to. Could be an ID of a channel object in the data model.
