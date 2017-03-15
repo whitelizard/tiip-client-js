@@ -43,6 +43,8 @@ Returns a TiipSession (with `new`).
 ### ```session.connect([url, options]);```
 Connect the socket, using *url* and *options* set via the constructor, or new ones passed here.
 Returns the session object (to enable chaining).
+-	**url:** Full address of websocket endpoint.
+- **options:** See description above, for the constructor.
 
 ### ```session.init();```
 Authenticate with possible cached credentials, otherwise rejects.
