@@ -16,10 +16,10 @@ const session = new TiipSession();
 session.connect('wss://echo.websocket.org');
 
 // Try to init with cached credentials
-session.init();
+session.init(); // returns promise
 
 // In other case, login with user credentials
-session.auth(userId, passphrase);
+session.auth(userId, passphrase); // returns promise
 
 // Test if we are connected and authenticated
 if (session.isOpen()) ...
