@@ -22,7 +22,7 @@ session.init();
 session.auth(userId, passphrase);
 
 // Test if we are connected and authenticated
-if (session.authenticated) ...
+if (session.isOpen()) ...
 
 session.logout()
 ```
