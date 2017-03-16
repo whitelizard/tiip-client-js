@@ -80,13 +80,13 @@ export class TiipSocket {
     this.subCallbacks = this.subCallbacks.clear();
   }
 
-  isOpen() {
-    return this.oSocket && this.oSocket.ws && this.oSocket.ws.readyState === 1;
-  }
-
-  isClosed() {
-    return !this.oSocket || !this.oSocket.ws || this.oSocket.ws.readyState === 3;
-  }
+  // isOpen() {
+  //   return this.oSocket && this.oSocket.ws && this.oSocket.ws.readyState === 1;
+  // }
+  //
+  // isClosed() {
+  //   return !this.oSocket || !this.oSocket.ws || this.oSocket.ws.readyState === 3;
+  // }
 
   bufferedAmount() {
     return this.oSocket && this.oSocket.ws && this.oSocket.ws.socket.bufferedAmount;
