@@ -10,7 +10,7 @@
     "clean": "rimraf ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "babel-node": "babel-node",
-    "compile1": "babel src/tiip-socket.js  -o tiip-socket.js",
+    "compile1": "babel src/tiip-socket.js -o tiip-socket.js",
     "compile2": "babel src/tiip-session.js -o index.js",
     "compile": "npm run compile1 && npm run compile2",
     "lint": "eslint src --ext js",
