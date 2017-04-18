@@ -13,7 +13,7 @@ import TiipSession from 'tiip-client-js';
 
 const session = new TiipSession();
 
-session.connect('wss://echo.websocket.org');
+session.connect('wss://echo.websocket.org'); // This URL will of course not work since it is not a service using tiip, it's just an example URL
 
 // Try to init with cached credentials
 session.init(); // returns promise
