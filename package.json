@@ -1,22 +1,13 @@
 {
   "name": "tiip-client-js",
-  "version": "0.2.8",
+  "version": "1.0.0",
   "description": "Websocket based JS client using protocol tiip",
-  "main": "lib/index.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "main": "index.js",
   "scripts": {
-    "clean": "rimraf ./index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "babel-node": "babel-node",
-    "compile1": "babel src/tiip-socket.js -o tiip-socket.js",
-    "compile2": "babel src/tiip-session.js -o index.js",
-    "compile": "npm run compile1 && npm run compile2",
-    "lint": "eslint src --ext js",
-    "build": "npm run clean && npm run lint && npm run compile",
-    "prepublish": "npm run build",
-    "docgen": "jsdox lib -o docs"
+    "test": "tap",
+    "lint": "eslint src",
+    "build": "babel src -o index.js",
+    "prepublishOnly": "npm run lint && npm run build"
   },
   "repository": {
     "type": "git",
@@ -35,29 +26,17 @@
     "url": "https://github.com/whitelizard/tiip-client-js/issues"
   },
   "homepage": "https://github.com/whitelizard/tiip-client-js#readme",
-  "dependencies": {
-    "babel-polyfill": "^6.9.1",
-    "crypto": "0.0.3",
-    "immutable": "^3.8.1",
-    "jstiip": "^1.0.6",
-    "observable-socket": "^5.0.0-beta3"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "babel-core": "^6.9.1",
-    "babel-eslint": "^6.0.4",
-    "babel-loader": "^6.2.4",
-    "babel-plugin-transform-class-properties": "^6.9.1",
-    "babel-plugin-transform-object-rest-spread": "^6.8.0",
-    "babel-preset-es2015": "^6.9.0",
-    "babel-preset-stage-0": "^6.5.0",
-    "chai": "^3.5.0",
-    "eslint": "^2.12.0",
-    "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.8.1",
-    "eslint-plugin-jsx-a11y": "^1.4.2",
-    "eslint-plugin-react": "^5.1.1",
-    "rimraf": "^2.5.2",
-    "websocket": "^1.0.23"
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-promise": "^4.2.1",
+    "prettier": "^2.0.5",
+    "tap": "^14.10.7"
   }
 }

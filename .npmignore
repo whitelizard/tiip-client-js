@@ -1,5 +1,6 @@
-src/
-test/
-bin/
-src/test/
-node_modules/
+/node_modules
+/test
+.babelrc.json
+.prettierrc.json
+.eslintrc.json
+.nyc_output

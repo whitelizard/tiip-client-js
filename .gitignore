@@ -1,6 +1,5 @@
 *.log
 npm-debug.log*
-node_modules
-index.js
-tiip-socket.js
-.npm
+/node_modules
+/.nyc_output
+/index.js
